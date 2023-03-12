@@ -1,7 +1,7 @@
 /*  ========== H03 - Personal Stack Implementation ============
  *
- *   Student: UPDATE
- *   Semester: UPDATE
+ *   Student: Sihui Lin
+ *   Semester: Spring 2023
  *
  * A simple stack implementation to hold int values.
  *
@@ -48,7 +48,11 @@ stack_t *create_stack(unsigned int capacity)
     // Modify the body of this function as needed.
     stack_t *myStack = NULL;
     // TODO: Implement me!!
-
+    myStack = (stack_t*)malloc(sizeof(stack_t));
+    myStack->head = (struct node *)malloc(sizeof(struct node));
+    myStack->head->next = NULL;
+    myStack->count = 0;
+    myStack->capacity = capacity;
     return myStack;
 }
 
@@ -60,8 +64,10 @@ stack_t *create_stack(unsigned int capacity)
 int stack_empty(stack_t *s)
 {
     // TODO: Implement me!!
-
-    return NULL;
+    if (s->head->next == NULL && s->count == 0)
+        return 1;
+    else
+        return 0;
 }
 
 /** Check if the stack is full
@@ -71,8 +77,10 @@ int stack_empty(stack_t *s)
 int stack_full(stack_t *s)
 {
     // TODO: Implement me!
-
-    return NULL;
+    if (s->count == s->capacity)
+        return 1;
+    else
+        return 0;
 }
 
 /** Enqueue a new item
@@ -83,8 +91,26 @@ int stack_full(stack_t *s)
 int stack_enqueue(stack_t *s, int item)
 {
     // TODO: Implement me!
-
-    return NULL; 
+    struct node *Node = (struct node *)malloc(sizeof(struct node));
+    Node->next = NULL;
+    Node->data = item;
+    // stack is not empty
+    if (stack_empty(s) == 0){
+        if(stack_full(s) == 0){
+            // stack is not full
+            Node->next = s->head->next;
+            s->head->next = Node;
+            s->count++;
+        }else{
+            // stack is full
+            return -1;
+        }
+    }else{
+        // stack is empty
+        s->head->next = Node;
+        s->count++;
+    }
+    return 0;
 }
 
 /** Dequeue an item
@@ -99,8 +125,21 @@ int stack_enqueue(stack_t *s, int item)
 int stack_dequeue(stack_t *s)
 {
     // TODO: Implement me!
-
-    return NULL; 
+    int res = 0;
+    if (stack_empty(s) == 0){
+        // stack is not empty
+        struct node *Node = (struct node *)malloc(sizeof(struct node));
+        Node = s->head->next;
+        res = Node->data;
+        s->head->next = Node->next;
+        s->count--;
+        free(Node);
+    }else{
+        // stack is empty
+        fputs("no items to dequeue!\n", stderr);
+        return EXIT_FAILURE;
+    }
+    return res; 
 }
 
 
@@ -111,8 +150,11 @@ int stack_dequeue(stack_t *s)
 unsigned int stack_size(stack_t *s)
 {
     // TODO: Implement me!
-
-    return NULL;
+    if(s == NULL){
+        fputs("stack hasn't been properly recreated!\n", stderr);
+        return -1;
+    }
+    return s->count;
 }
 
 
@@ -123,6 +165,15 @@ unsigned int stack_size(stack_t *s)
 void free_stack(stack_t *s)
 {
     // TODO: Implement me!
+    if (stack_empty(s) == 1){
+         // stack is empty
+        free(s);
+    }else{
+        // stack is not empty
+        while(stack_empty(s) == 0){
+            stack_dequeue(s);
+        }
+        free(s);
+    }
 }
-
 #endif
